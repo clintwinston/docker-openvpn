@@ -6,6 +6,32 @@
 [![ImageLayers](https://images.microbadger.com/badges/image/kylemanna/openvpn.svg)](https://microbadger.com/#/images/kylemanna/openvpn)
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fkylemanna%2Fdocker-openvpn.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fkylemanna%2Fdocker-openvpn?ref=badge_shield)
 
+This is a fork of (https://github.com/kylemanna/docker-openvpn) with added ability to use Double VPN.
+
+ * Usage example:
+
+ Inbound:
+  docker-compose run --rm openvpn ovpn_genconfig -u udp://1.2.3.4 -s 192.168.250.0/24 -S
+  docker-compose run --rm openvpn ovpn_initpki
+  export CLIENTNAME="myself"
+  docker-compose run --rm openvpn easyrsa build-client-full $CLIENTNAME nopass
+  docker-compose run --rm openvpn ovpn_getclient $CLIENTNAME > $CLIENTNAME.ovpn
+
+ OutBound:
+  docker-compose run --rm openvpn ovpn_genconfig -u udp://5.6.7.8 -s 192.168.251.0/24 -d -N
+  docker-compose run --rm openvpn ovpn_initpki
+  export CLIENTNAME="outbound"
+  docker-compose run --rm openvpn easyrsa build-client-full $CLIENTNAME nopass
+  docker-compose run --rm openvpn ovpn_getclient $CLIENTNAME > $CLIENTNAME.ovpn
+
+ Copy outbound.ovpn to openvpn-data/conf/nexthop.conf on Inbound
+
+ run docker-compose up
+ on both servers
+
+ Enjoy!
+
+
 
 OpenVPN server in a Docker container complete with an EasyRSA PKI CA.
 
