@@ -172,7 +172,7 @@ OVPN_TLS_CIPHER=''
 [ -r "$OVPN_ENV" ] && source "$OVPN_ENV"
 
 # Parse arguments
-while getopts ":a:e:E:C:T:r:s:du:bcp:n:k:DNm:f:tz2" opt; do
+while getopts ":a:e:E:C:T:r:s:du:bcp:n:k:DNm:f:tz2:S" opt; do
     case $opt in
         a)
             OVPN_AUTH="$OPTARG"
@@ -259,6 +259,8 @@ while getopts ":a:e:E:C:T:r:s:du:bcp:n:k:DNm:f:tz2" opt; do
             usage
             exit 1
             ;;
+	S)  OVPN_SLAVE=1
+	    ;;
         :)
             set +x
             echo "Option -$OPTARG requires an argument." >&2

@@ -59,6 +59,11 @@ if [ ! -c /dev/net/tun ]; then
     mknod /dev/net/tun c 10 200
 fi
 
+if [ ! -c /dev/net/tun99 ]; then
+    mknod /dev/net/tun99 c 10 200
+fi
+
+
 if [ -d "$OPENVPN/ccd" ]; then
     addArg "--client-config-dir" "$OPENVPN/ccd"
 fi
@@ -102,4 +107,18 @@ if [ $? = 0 ]; then
 fi
 
 echo "Running 'openvpn ${ARGS[@]} ${USER_ARGS[@]}'"
+
+if [ "$OVPN_SLAVE" == "1" ] ; then 
+        echo "adding rules for $OVPN_SERVER to table ... "
+        ip rule add from $OVPN_SERVER table 1001
+
+	echo "starting next hop vpn..."
+	exec openvpn --config /etc/openvpn/nexthop.conf --dev tun99 &
+	sleep 3 
+
+	echo "adding default route for next-hop"
+        ip route add 0.0.0.0/0 dev tun99 table 1001	
+	 iptables -t nat -I POSTROUTING  2 -s $OVPN_SERVER -o tun99 -j MASQUERADE
+fi
+
 exec openvpn ${ARGS[@]} ${USER_ARGS[@]}
