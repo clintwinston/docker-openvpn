@@ -10,6 +10,7 @@ This is a fork of (https://github.com/kylemanna/docker-openvpn) with added abili
 
  * Usage example:
 
+```
  Inbound:
   docker-compose run --rm openvpn ovpn_genconfig -u udp://1.2.3.4 -s 192.168.250.0/24 -S
   docker-compose run --rm openvpn ovpn_initpki
@@ -25,6 +26,7 @@ This is a fork of (https://github.com/kylemanna/docker-openvpn) with added abili
   docker-compose run --rm openvpn ovpn_getclient $CLIENTNAME > $CLIENTNAME.ovpn
 
  Copy outbound.ovpn to openvpn-data/conf/nexthop.conf on Inbound
+```
 
  run docker-compose up
  on both servers
