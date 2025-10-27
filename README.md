@@ -42,7 +42,7 @@ This is a fork of (https://github.com/kylemanna/docker-openvpn) with added abili
   # sets CLIENT name for future use
   export CLIENTNAME="myself"
 
-  # generate client certificate and export it to file (should be used like '''openvpn --config FILENAME.ovpn'''
+  # generate client certificate and export it to file (should be used like: 'openvpn --config FILENAME.ovpn' on a client
   docker-compose run --rm openvpn easyrsa build-client-full $CLIENTNAME nopass
   docker-compose run --rm openvpn ovpn_getclient $CLIENTNAME > $CLIENTNAME.ovpn
 
@@ -68,7 +68,7 @@ services:
     image: clint99/docker-openvpn
     container_name: dopenvpn
     ports:
-     - "443:1194/tcp"
+     - "1194:1194/tcp"
     restart: always
     volumes:
      - ./openvpn-data/conf:/etc/openvpn:
