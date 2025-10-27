@@ -11,6 +11,23 @@ This is a fork of (https://github.com/kylemanna/docker-openvpn) with added abili
  * Usage example:
 
 ```
+Default compose file (docker-compose.yaml) for UDP support:
+
+version: '2'
+services:
+  openvpn:
+    cap_add:
+     - NET_ADMIN
+    image: clint99/docker-openvpn
+    container_name: dopenvpn
+    ports:
+     - "1194:1194/udp"
+    restart: always
+    volumes:
+     - ./openvpn-data/conf:/etc/openvpn
+```
+
+```
  Inbound:
   docker-compose run --rm openvpn ovpn_genconfig -u udp://1.2.3.4 -s 192.168.250.0/24 -S
   docker-compose run --rm openvpn ovpn_initpki
