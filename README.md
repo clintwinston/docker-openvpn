@@ -31,7 +31,7 @@ This is a fork of (https://github.com/kylemanna/docker-openvpn) with added abili
  * Usage with TCP with addition comments:
 
 ```
- Inbound (The first server in chain):
+ Inbound (first server in the chain):
 
   # generate main configuration
   docker-compose run --rm openvpn ovpn_genconfig -u tcp://PUBLIC_FIRST_SERVER_IP -s 192.168.250.0/24 -S
@@ -42,23 +42,26 @@ This is a fork of (https://github.com/kylemanna/docker-openvpn) with added abili
   # sets CLIENT name for future use
   export CLIENTNAME="myself"
 
-  # generate client certificate and export it to file (should be used like: 'openvpn --config FILENAME.ovpn' on a client
+  # generate client certificate and export it to file (should be used like: 'openvpn --config myself.ovpn' on a client
   docker-compose run --rm openvpn easyrsa build-client-full $CLIENTNAME nopass
   docker-compose run --rm openvpn ovpn_getclient $CLIENTNAME > $CLIENTNAME.ovpn
 
  # repeat it for VPN tunnel between vpn servers:
- OutBound (The second server in chain):
+ OutBound (second server in the chain):
   docker-compose run --rm openvpn ovpn_genconfig -u tcp://PUBLIC_SECOND_SERVER_IP -s 192.168.251.0/24 -d -N
   docker-compose run --rm openvpn ovpn_initpki
   export CLIENTNAME="outbound"
+
+  # generate client to link between first and second serversi ( look at below )
   docker-compose run --rm openvpn easyrsa build-client-full $CLIENTNAME nopass
   docker-compose run --rm openvpn ovpn_getclient $CLIENTNAME > $CLIENTNAME.ovpn
 
- Copy outbound.ovpn to openvpn-data/conf/nexthop.conf on Inbound server
+  Now we need to copy our first-to-second openvpn client config:
+     outbound.ovpn -> openvpn-data/conf/nexthop.conf on Inbound server
 ```
 
 ``` 
-Do not forget to update compose for TCP forwarding:
+Do not forget to update compose for TCP forwarding!
 
 version: '2'
 services:
@@ -73,7 +76,10 @@ services:
     volumes:
      - ./openvpn-data/conf:/etc/openvpn:
 ```
-
+```
+  change port for example to 443 if need (do not forget also update port in client configuration file)
+  after that just run:
+```
 
  run docker-compose up
  on both servers
