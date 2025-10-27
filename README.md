@@ -79,12 +79,12 @@ services:
 ```
   change port for example to 443 if need (do not forget also update port in client configuration file)
   after that just run:
+
+ docker-compose up
+ on both servers
 ```
 
- run docker-compose up
- on both servers
-
- Enjoy!
+ ***Enjoy!***
 
 
 
