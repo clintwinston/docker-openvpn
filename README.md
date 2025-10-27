@@ -28,6 +28,53 @@ This is a fork of (https://github.com/kylemanna/docker-openvpn) with added abili
  Copy outbound.ovpn to openvpn-data/conf/nexthop.conf on Inbound
 ```
 
+ * Usage with TCP with addition comments:
+
+```
+ Inbound (The first server in chain):
+
+  # generate main configuration
+  docker-compose run --rm openvpn ovpn_genconfig -u tcp://PUBLIC_FIRST_SERVER_IP -s 192.168.250.0/24 -S
+
+  # init pki (SSL database)
+  docker-compose run --rm openvpn ovpn_initpki
+
+  # sets CLIENT name for future use
+  export CLIENTNAME="myself"
+
+  # generate client certificate and export it to file (should be used like '''openvpn --config FILENAME.ovpn'''
+  docker-compose run --rm openvpn easyrsa build-client-full $CLIENTNAME nopass
+  docker-compose run --rm openvpn ovpn_getclient $CLIENTNAME > $CLIENTNAME.ovpn
+
+ # repeat it for VPN tunnel between vpn servers:
+ OutBound (The second server in chain):
+  docker-compose run --rm openvpn ovpn_genconfig -u tcp://PUBLIC_SECOND_SERVER_IP -s 192.168.251.0/24 -d -N
+  docker-compose run --rm openvpn ovpn_initpki
+  export CLIENTNAME="outbound"
+  docker-compose run --rm openvpn easyrsa build-client-full $CLIENTNAME nopass
+  docker-compose run --rm openvpn ovpn_getclient $CLIENTNAME > $CLIENTNAME.ovpn
+
+ Copy outbound.ovpn to openvpn-data/conf/nexthop.conf on Inbound server
+```
+
+``` 
+Do not forget to update compose for TCP forwarding:
+
+version: '2'
+services:
+  openvpn:
+    cap_add:
+     - NET_ADMIN
+    image: clint99/docker-openvpn
+    container_name: dopenvpn
+    ports:
+     - "443:1194/tcp"
+    restart: always
+    volumes:
+     - ./openvpn-data/conf:/etc/openvpn:
+```
+
+
  run docker-compose up
  on both servers
 
